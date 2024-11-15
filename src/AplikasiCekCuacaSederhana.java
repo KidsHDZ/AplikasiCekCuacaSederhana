@@ -1,61 +1,40 @@
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.swing.*;
+import java.awt.event.*;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import java.awt.Image;
+import javax.imageio.ImageIO;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 public class AplikasiCekCuacaSederhana extends javax.swing.JFrame {
 
-    private final String API_KEY = "cd5bb28f6fae466a76fc56fbddcf4a8d"; // Ganti dengan API key Anda
+    private final String apiKey = "cd5bb28f6fae466a76fc56fbddcf4a8d"; // Ganti dengan API key Anda
     private final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+    private ArrayList<String> favoriteCities = new ArrayList<>();
     
     public AplikasiCekCuacaSederhana() {
         initComponents();
+        
         jTable1.setModel(new DefaultTableModel(
-            new Object[][]{},
-            new String[]{"Tanggal", "Kota", "Suhu (°C)", "Kondisi", "Kelembapan (%)"}
-        ));
-        jLabelCuaca = new javax.swing.JLabel();
-    }
-    
-    private void cekCuaca(String city) {
-        try {
-        String urlString = BASE_URL + "?q=" + city + "&appid=" + API_KEY + "&units=metric";
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        int responseCode = conn.getResponseCode();
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            
-            parseJSON(response.toString());
-        } else {
-            System.out.println("GET request failed. Error code: " + responseCode);
-        }
-            } catch (Exception e) {
-            e.printStackTrace();
+    new Object[][] {},
+    new String[] {"Tanggal", "Kota", "Suhu", "Kondisi", "Kelembapan"}
+));
+        
+         jComboBox1.addItemListener(new ItemListener() {
+        public void itemStateChanged(ItemEvent evt) {
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            String selectedCity = (String) jComboBox1.getSelectedItem();
+            getWeather(selectedCity);  // Mendapatkan cuaca berdasarkan kota yang dipilih
         }
     }
+});    
+    }
     
-    @SuppressWarnings("unchecked")
+ @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -185,19 +164,23 @@ public class AplikasiCekCuacaSederhana extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jTextField1)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                             .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
                         .addGap(60, 60, 60)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(58, 58, 58))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(58, 58, 58))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 521, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
@@ -221,10 +204,10 @@ public class AplikasiCekCuacaSederhana extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jButton2))
+                        .addGap(47, 47, 47)
                         .addComponent(jButton3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton4)
@@ -260,16 +243,21 @@ public class AplikasiCekCuacaSederhana extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String city = jTextField1.getText();
-    if (!city.isEmpty()) {
-        cekCuaca(city);
-    } else {
-        System.out.println("Please enter a city name.");
-    }
+     String city = jTextField1.getText();
+        if (city.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Masukkan nama kota.");
+            return;
+        }
+        getWeather(city);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        simpanKeFavorit(evt);
+         String city = jTextField1.getText();
+    if (!city.isEmpty() && !favoriteCities.contains(city)) {
+        favoriteCities.add(city);
+        jComboBox1.addItem(city);
+        getWeather(city); // Mendapatkan data cuaca kota yang disimpan
+    }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -277,149 +265,114 @@ public class AplikasiCekCuacaSederhana extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    
-    // Membuat objek file CSV
-    File file = new File("cuaca_data.csv");
-
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-        // Menulis header kolom ke file CSV
-        writer.write("Tanggal,Kota,Suhu (°C),Kondisi,Kelembapan (%)");
-        writer.newLine();
-
-        // Menulis data setiap baris dari tabel ke file CSV
-        for (int i = 0; i < model.getRowCount(); i++) {
-            String tanggal = model.getValueAt(i, 0).toString();
-            String kota = model.getValueAt(i, 1).toString();
-            String suhu = model.getValueAt(i, 2).toString();
-            String kondisi = model.getValueAt(i, 3).toString();
-            String kelembapan = model.getValueAt(i, 4).toString();
-
-            writer.write(tanggal + "," + kota + "," + suhu + "," + kondisi + "," + kelembapan);
-            writer.newLine();
-        }
-
-        JOptionPane.showMessageDialog(this, "Data berhasil disimpan ke cuaca_data.csv", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat menyimpan file.", "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
+        saveWeatherData();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-         javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-    int returnValue = fileChooser.showOpenDialog(this);
-    if (returnValue == javax.swing.JFileChooser.APPROVE_OPTION) {
-        File file = fileChooser.getSelectedFile();
-        
-        try (BufferedReader br = new BufferedReader(new java.io.FileReader(file))) {
-            String line;
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0); // Clear existing rows
-            
-            // Skip the header line
-            br.readLine();
-            
-            // Read each line and add to the table
-            while ((line = br.readLine()) != null) {
-                String[] rowData = line.split(",");
-                model.addRow(rowData);
-            }
-            JOptionPane.showMessageDialog(this, "Data berhasil diimport dari " + file.getName(), "Sukses", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat mengimpor file.", "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
+        loadWeatherData();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    int[] selectedRows = jTable1.getSelectedRows();
-    
-    if (selectedRows.length > 0) {
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            model.removeRow(selectedRows[i]);
-        }
-        JOptionPane.showMessageDialog(this, "Baris yang dipilih berhasil dihapus.", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-    } else {
-        JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus.", "Info", JOptionPane.INFORMATION_MESSAGE);
-    }
+        
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         System.exit(0);
     }//GEN-LAST:event_jButton8ActionPerformed
-    
-        private void simpanKeFavorit(java.awt.event.ActionEvent evt) {
-    String city = jTextField1.getText();
-    if (!city.isEmpty()) {
-        // Cek apakah kota sudah ada di dalam ComboBox
-        boolean isCityExist = false;
-        for (int i = 0; i < jComboBox1.getItemCount(); i++) {
-            if (jComboBox1.getItemAt(i).equalsIgnoreCase(city)) {
-                isCityExist = true;
-                break;
+ 
+    private void getWeather(String city) {
+        try {
+            String apiUrl = String.format("http://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s", city, apiKey);
+            HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
+            connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            parseWeatherData(response.toString(), city);
+        } catch (IOException | org.json.JSONException e) {
+            JOptionPane.showMessageDialog(this, "Tidak dapat mengambil data cuaca.");
+        }
+    }
+
+    private void parseWeatherData(String jsonData, String city) {
+    try {
+        JSONObject obj = new JSONObject(jsonData);
+        JSONObject main = obj.getJSONObject("main");
+        JSONArray weatherArray = obj.getJSONArray("weather");
+        JSONObject weather = weatherArray.getJSONObject(0);
+
+        String description = weather.getString("description");
+        String iconCode = weather.getString("icon");  // Ikon cuaca
+        double temp = main.getDouble("temp") - 273.15; // Konversi ke Celsius
+        int humidity = main.getInt("humidity"); // Kelembapan
+        String date = java.time.LocalDate.now().toString(); // Tanggal saat ini
+
+        // Menambahkan data ke tabel
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.addRow(new Object[]{date, city, String.format("%.2f°C", temp), description, humidity + "%"});
+        
+        // Menampilkan ikon cuaca
+        setWeatherIcon(iconCode);
+    } catch (org.json.JSONException e) {
+        e.printStackTrace();
+    }
+}
+
+    private void setWeatherIcon(String iconCode) {
+        try {
+            String iconUrl = String.format("http://openweathermap.org/img/wn/%s@2x.png", iconCode);
+            Image image = ImageIO.read(new URL(iconUrl));
+            jLabelCuaca.setIcon(new ImageIcon(image));  // Set gambar ikon cuaca pada JLabel
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveWeatherData() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showSaveDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    writer.write(model.getValueAt(i, 0) + "," +
+                            model.getValueAt(i, 1) + "," +
+                            model.getValueAt(i, 2) + "\n");
+                }
+                JOptionPane.showMessageDialog(this, "Data berhasil disimpan.");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        // Jika kota belum ada di dalam ComboBox, tambahkan ke dalam daftar favorit
-        if (!isCityExist) {
-            jComboBox1.addItem(city);
-            System.out.println("Kota " + city + " ditambahkan ke favorit.");
-        } else {
-            System.out.println("Kota " + city + " sudah ada di favorit.");
+    }
+
+    private void loadWeatherData() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            model.setRowCount(0); // Kosongkan tabel
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] data = line.split(",");
+                    model.addRow(data);
+                }
+                JOptionPane.showMessageDialog(this, "Data berhasil dimuat.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    } else {
-        System.out.println("Masukkan nama kota untuk disimpan ke favorit.");
     }
-}
-        
-   private void setWeatherIcon(String iconCode) {
-    try {
-        // URL untuk ikon cuaca dari OpenWeatherMap
-        String iconUrl = String.format("http://openweathermap.org/img/wn/%s@2x.png", iconCode);
-        
-        // Baca gambar dari URL dan ubah menjadi ImageIcon untuk JLabel
-        Image image = ImageIO.read(new URL(iconUrl));
-        
-        // Periksa apakah gambar berhasil diunduh
-        if (image != null) {
-            // Set gambar pada JLabel
-            jLabelCuaca.setIcon(new ImageIcon(image));
-        } else {
-            JOptionPane.showMessageDialog(this, "Gagal memuat ikon cuaca.");
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat mengunduh ikon cuaca.");
-    }
-}
-   
-    private void parseJSON(String responseBody) {
-        JSONObject obj = new JSONObject(responseBody);
-
-        // Mengambil data dari JSON
-        String cityName = obj.getString("name");
-        double temperature = obj.getJSONObject("main").getDouble("temp");
-        String weatherDescription = obj.getJSONArray("weather").getJSONObject(0).getString("description");
-        int humidity = obj.getJSONObject("main").getInt("humidity");
-
-        // Ambil kode ikon cuaca dari JSON dan tampilkan gambar
-        String iconCode = obj.getJSONArray("weather").getJSONObject(0).getString("icon");
-        setWeatherIcon(iconCode);
-
-        // Konversi Unix Timestamp ke Tanggal
-        long timestamp = obj.getLong("dt");
-        java.util.Date date = new java.util.Date(timestamp * 1000);
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String formattedDate = sdf.format(date);
-
-        // Tambahkan data ke tabel
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.addRow(new Object[]{formattedDate, cityName, temperature, weatherDescription, humidity});
-    }
-
-      
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
