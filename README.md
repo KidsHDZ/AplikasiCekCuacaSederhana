@@ -37,4 +37,4 @@ Muhhammad Ikhya 2210010405
 
 ## Screenshots
 
-![DEMO GIF](URL_Screenshot)
+![DEMO GIF](img/cuacademo.GIF)
